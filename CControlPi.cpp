@@ -7,7 +7,12 @@ CControlPi::CControlPi()
 
     if (gpioInitialise() < 0)
     {
-        gpioSetMode(RED_LED, PI_OUTPUT); //red led
+
+        gpioTerminate();
+    }
+    else
+    {
+          gpioSetMode(RED_LED, PI_OUTPUT); //red led
     gpioSetMode(GREEN_LED, PI_OUTPUT); //green led
     gpioSetMode(BLUE_LED, PI_OUTPUT); //blue led
     gpioSetMode(BUTTON_1, PI_INPUT); //button 1
@@ -15,17 +20,12 @@ CControlPi::CControlPi()
      gpioSetMode(BUTTON_2, PI_INPUT); //button 2
     gpioSetPullUpDown(BUTTON_2, PI_PUD_UP);
 
-    int _handle = spiOpen(0, 200000, 3);
+        _handle = spiOpen(0, 200000, 3);
         if(_handle < 0)
         {
             gpioTerminate();
         }
 
-    }
-    else
-    {
-
-        gpioTerminate();
     }
 
 }
@@ -51,7 +51,7 @@ bool CControlPi::get_data(int type, int channel, int& result)
     if(type == ANALOG) //analog
     {
         //spi stuff
-        int read_val
+        int read_val;
         unsigned char inBuf[3];
         char cmd[] = {1, static_cast<char>((8 + channel) << 4), 0}; //0b1XXX0000 where XXX= channel
 
@@ -90,7 +90,7 @@ float CControlPi::get_analog(int channel, int& result)
 {
     float percentage;
 	get_data(ANALOG, channel, result);
-	percentage = (result / (float)4096) * 100;
+	percentage = (result / (float)1023) * 100;
 	return percentage;
 }
 

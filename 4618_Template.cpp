@@ -671,6 +671,7 @@ int main(int argc, char* argv[])
     case 4: lab4(); break;
     case 5: lab5(); break;
     case 6: lab6(); break;
+    case 7: lab7(); break;
     /*case 10: test_com(); break;
 		case 11: do_image(); break;
 		case 12: do_video(); break;
