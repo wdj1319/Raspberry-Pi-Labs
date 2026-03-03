@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Lab7" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Lab7" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Lab7" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="`pkg-config --cflags opencv4` -std=c++11" />
+		</Compiler>
+		<Linker>
+			<Add option="-Wall `pkg-config --libs opencv4` -std=c++11 -lpigpio -lrt -lpthread" />
+		</Linker>
+		<Unit filename="../Labs/4618_Template-master/4618_Template.cpp" />
+		<Unit filename="../Labs/4618_Template-master/4618_Template.h" />
+		<Unit filename="../Labs/4618_Template-master/CBase4618.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CBase4618.h" />
+		<Unit filename="../Labs/4618_Template-master/CControl.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CControl.h" />
+		<Unit filename="../Labs/4618_Template-master/CControlPi.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CControlPi.h" />
+		<Unit filename="../Labs/4618_Template-master/CGameObject.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CGameObject.h" />
+		<Unit filename="../Labs/4618_Template-master/CInvader.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CInvader.h" />
+		<Unit filename="../Labs/4618_Template-master/CMissile.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CMissile.h" />
+		<Unit filename="../Labs/4618_Template-master/CPong.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CPong.h" />
+		<Unit filename="../Labs/4618_Template-master/CShip.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CShip.h" />
+		<Unit filename="../Labs/4618_Template-master/CSketch.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CSketch.h" />
+		<Unit filename="../Labs/4618_Template-master/CSpaceInvaderGame.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CSpaceInvaderGame.h" />
+		<Unit filename="../Labs/4618_Template-master/cvui.h" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
