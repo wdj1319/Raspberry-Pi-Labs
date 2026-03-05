@@ -4,7 +4,7 @@
 CControlPi::CControlPi()
 {
     //FOR RPI
-
+    _last_servo_val = 500;
     if (gpioInitialise() < 0)
     {
 
@@ -65,7 +65,10 @@ bool CControlPi::get_data(int type, int channel, int& result)
     if(type == SERVO) //servo
     {
         //just read last position known
+        result = _last_servo_val;
+        return true;
     }
+    return false;
 }
 
 bool CControlPi::set_data(int type, int channel, int val)
@@ -82,8 +85,12 @@ bool CControlPi::set_data(int type, int channel, int val)
     }
     if(type == SERVO) //servo
     {
-
+        //GOES FROM 500 to 2500!!!!!!
+        gpioServo(SERVO_PIN, val);
+        _last_servo_val = val;
+        return true;
     }
+    return false;
 }
 
 float CControlPi::get_analog(int channel, int& result)

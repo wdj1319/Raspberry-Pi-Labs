@@ -10,6 +10,7 @@
 #define ANALOG 1
 #define DIGITAL 0
 #define SERVO 2
+#define SERVO_PIN 23
 
 class CControlPi {
 private:
@@ -20,6 +21,7 @@ private:
 	double _last_time_1; ///< the last time the state changed for button 1
 	double _last_time_2; ///< the last time the state changed for button 2
 	int _handle;
+	int _last_servo_val;
 public:
 	CControlPi();
 	~CControlPi();

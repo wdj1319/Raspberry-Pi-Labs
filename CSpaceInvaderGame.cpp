@@ -88,7 +88,7 @@ bool CSpaceInvaderGame::update()
 	const int max_height = _canvas_size.height - 1;
 	const int min_width = 1;
 	const int min_height = 1;
-	const cv::Point joystick_rest(2048, 2048);
+	const cv::Point joystick_rest(512, 512);
 	bool wall_collision = false;
 	int rng_num = 0;
 
@@ -107,7 +107,7 @@ bool CSpaceInvaderGame::update()
 
 
 	//x coord right
-	if (_coordinates.x - joystick_rest.x >= 500)
+	if (_coordinates.x - joystick_rest.x >= 250)
 	{
 		_ship.set_pos(_ship.get_pos() + cv::Point2f(9, 0));
 
@@ -117,7 +117,7 @@ bool CSpaceInvaderGame::update()
 		}
 	}
 	//x coord left
-	if (_coordinates.x - joystick_rest.x <= -500)
+	if (_coordinates.x - joystick_rest.x <= -250)
 	{
 		_ship.set_pos(_ship.get_pos() - cv::Point2f(9, 0));
 
