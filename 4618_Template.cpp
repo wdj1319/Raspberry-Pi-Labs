@@ -28,6 +28,7 @@
 #include "CPong.h"
 #include "CBase4618.h"
 #include "CSpaceInvaderGame.h"
+#include "CRecyclingSort.h"
 
 // Must include Windows.h after Winsock2.h, so Serial must be included after Client/Server
 
@@ -597,31 +598,30 @@ void lab7()
         bool direction = true; // true = forward, false = backwards
 
 
-        while (cv::waitKey(1) != 'q')
+        while (cv::waitKey(10) != 'q')
         {
-
-            control.get_data(SERVO, 19, last_pos);
+            control.get_data(SERVO, SERVO_PIN, last_pos);
             //std::cout << "SERVO TEST: CH" << 19 << " POS " << last_pos << "\n";
             current_pos = last_pos;
-            if (last_pos == 180)
+            if (last_pos == 2500)
             {
                 direction = false;
             }
-            if (last_pos == 0)
+            if (last_pos == 500)
             {
                 direction = true;
             }
             if (direction)
             {
-                current_pos = current_pos + 1;
-                control.set_data(SERVO, 19, current_pos);
-                std::cout << "SERVO TEST: CH" << 19 << " POS " << current_pos << "\n";
+                current_pos = current_pos + 50;
+                control.set_data(SERVO, SERVO_PIN, current_pos);
+                std::cout << "SERVO TEST: CH" << SERVO_PIN << " POS " << current_pos << "\n";
             }
             if (!direction)
             {
-                current_pos = current_pos - 1;
-                control.set_data(SERVO, 19, current_pos);
-                std::cout << "SERVO TEST: CH" << 19 << " POS " << current_pos << "\n";
+                current_pos = current_pos - 50;
+                control.set_data(SERVO, SERVO_PIN, current_pos);
+                std::cout << "SERVO TEST: CH" << SERVO_PIN << " POS " << current_pos << "\n";
 
             }
 
@@ -630,6 +630,15 @@ void lab7()
     }
 
 
+}
+
+////////////////////////////////////////////////////////////////
+// Lab 8
+////////////////////////////////////////////////////////////////
+void lab8()
+{
+    CRecyclingSort recycling;
+    recycling.run();
 }
 
 void print_menu()
@@ -672,6 +681,7 @@ int main(int argc, char* argv[])
     case 5: lab5(); break;
     case 6: lab6(); break;
     case 7: lab7(); break;
+    case 8: lab8(); break;
     /*case 10: test_com(); break;
 		case 11: do_image(); break;
 		case 12: do_video(); break;

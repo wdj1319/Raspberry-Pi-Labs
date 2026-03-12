@@ -35,6 +35,7 @@
 		<Linker>
 			<Add option="-Wall `pkg-config --libs opencv4` -std=c++11 -lpigpio -lrt -lpthread" />
 		</Linker>
+		<Unit filename="../Labs/4618_Template-master/4618_Client.cbp" />
 		<Unit filename="../Labs/4618_Template-master/4618_Template.cpp" />
 		<Unit filename="../Labs/4618_Template-master/4618_Template.h" />
 		<Unit filename="../Labs/4618_Template-master/CBase4618.cpp" />
@@ -51,6 +52,8 @@
 		<Unit filename="../Labs/4618_Template-master/CMissile.h" />
 		<Unit filename="../Labs/4618_Template-master/CPong.cpp" />
 		<Unit filename="../Labs/4618_Template-master/CPong.h" />
+		<Unit filename="../Labs/4618_Template-master/CRecyclingSort.cpp" />
+		<Unit filename="../Labs/4618_Template-master/CRecyclingSort.h" />
 		<Unit filename="../Labs/4618_Template-master/CShip.cpp" />
 		<Unit filename="../Labs/4618_Template-master/CShip.h" />
 		<Unit filename="../Labs/4618_Template-master/CSketch.cpp" />
