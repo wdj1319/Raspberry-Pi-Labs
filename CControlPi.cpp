@@ -19,6 +19,10 @@ CControlPi::CControlPi()
     gpioSetPullUpDown(BUTTON_1, PI_PUD_UP);
      gpioSetMode(BUTTON_2, PI_INPUT); //button 2
     gpioSetPullUpDown(BUTTON_2, PI_PUD_UP);
+    gpioSetMode(14, PI_OUTPUT);
+    gpioSetMode(15, PI_OUTPUT);
+    gpioSetMode(26, PI_OUTPUT); //power for servo
+
 
         _handle = spiOpen(0, 200000, 3);
         if(_handle < 0)
