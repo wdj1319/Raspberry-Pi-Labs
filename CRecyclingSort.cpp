@@ -34,6 +34,8 @@ CRecyclingSort::CRecyclingSort()
 	_crop_height = 162;
 	_crop_width = 168;
 	cvui::init("Settings");
+	_manual_ramp = false;
+	_manual_mode = false;
 	prev_state = 0;
 	state = 1;
 	control.set_data(2, SERVO_WHEEL, 1400);
@@ -50,8 +52,60 @@ CRecyclingSort::~CRecyclingSort()
 
 bool CRecyclingSort::gpio()
 {
+    if(!_manual_mode)
+    {
+        control.set_data(0, BLUE_LED, 0);
+    }
+    int button;
+    if (control.get_button(BUTTON_1, button))
+    {
 
-    if (state == 3)
+        control.set_data(0, BLUE_LED, 1);
+        _manual_mode = !_manual_mode;
+        _timer_started = false;
+        if(_manual_mode)
+        {
+             state = 4;
+        }
+    }
+    if (_manual_mode)
+    {
+        if (control.get_button(BUTTON_2, button))
+        {
+            _manual_ramp = !_manual_ramp;
+            if (_manual_ramp)
+            {
+                control.set_data(2, SERVO_RAMP, 1800);
+            } else
+            {
+                control.set_data(2, SERVO_RAMP, 1500);
+            }
+        }
+    }
+
+    if(state == 4)
+    {
+
+        if (!_timer_started)
+        {
+            _state_start_time = cv::getTickCount();
+            _timer_started = true;
+        }
+        double elapsed = (cv::getTickCount() - _state_start_time) / cv::getTickFrequency();
+
+        if (elapsed >= 0.25 && elapsed < 0.5)
+        {
+            control.set_data(2, SERVO_WHEEL, 2500);
+        }
+        else if (elapsed >= 0.5)
+        {
+            _timer_started = false;
+            prev_state = 4;
+            state = 1;
+        }
+    }
+
+    if (state == 3 && !_manual_mode)
     {
         if (!_timer_started)
         {
@@ -59,13 +113,13 @@ bool CRecyclingSort::gpio()
             {
             if (_is_green)
             {
-                control.set_data(1, 27, 1);
+                control.set_data(0, 27, 1);
                 control.set_data(2, SERVO_RAMP, 1800);
             }
             else
             {
-                control.set_data(1, 17, 1);
-                control.set_data(2, SERVO_RAMP, 1300);
+                control.set_data(0, 17, 1);
+                control.set_data(2, SERVO_RAMP, 1500);
             }
             }
             _state_start_time = cv::getTickCount();
@@ -74,14 +128,14 @@ bool CRecyclingSort::gpio()
 
         double elapsed = (cv::getTickCount() - _state_start_time) / cv::getTickFrequency();
 
-        if (elapsed >= 1 && elapsed < 2)
+        if (elapsed >= 0.25 && elapsed < 0.5)
         {
             if(!_is_nothing)
             {
             control.set_data(2, SERVO_WHEEL, 2500);
             }
         }
-        else if (elapsed >= 4)
+        else if (elapsed >= 0.5)
         {
             _timer_started = false;
             prev_state = state;
@@ -98,18 +152,18 @@ bool CRecyclingSort::update()
 	if (_capture.isOpened())
 	{
 
-        if(state == 1 && (prev_state == 3 || prev_state == 0))
+        if(state == 1 && (prev_state == 3 || prev_state == 0 || prev_state == 4))
         {
             if(!_timer_started)
             {
-            control.set_data(1, 27, 0);
-            control.set_data(1, 17, 0);
+            control.set_data(0, 27, 0);
+            control.set_data(0, 17, 0);
             control.set_data(2, SERVO_WHEEL, 500);
             _state_start_time = cv::getTickCount();
             _timer_started = true;
             }
         double elapsed = (cv::getTickCount() - _state_start_time) / cv::getTickFrequency();
-        if (elapsed >= 3)
+        if (elapsed >= 0.25)
         {
             _timer_started = false;
             prev_state = state;
@@ -127,7 +181,7 @@ bool CRecyclingSort::update()
         }
 
         double elapsed = (cv::getTickCount() - _state_start_time) / cv::getTickFrequency();
-        if (elapsed >= 2)
+        if (elapsed >= 0.25)
         {
             _timer_started = false;
 
@@ -192,12 +246,19 @@ bool CRecyclingSort::update()
 		}
             _timer_started = false;
             prev_state = state;
-            state = 3;
+            if (_manual_mode)
+            {
+                state = 4;
+            }
+            else
+            {
+                state = 3;
             }
 		}
 
 	}
 	return true;
+}
 }
 
 bool CRecyclingSort::draw()

@@ -41,6 +41,8 @@ private:
 	int prev_state;
 	double _state_start_time;
     bool _timer_started;
+    bool _manual_ramp;
+    bool _manual_mode;
 
 public:
 	CRecyclingSort();
