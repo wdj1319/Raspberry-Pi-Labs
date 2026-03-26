@@ -2,6 +2,11 @@
 #include "CBase4618.h"
 
 
+#define SERVO_WHEEL 26
+
+#define SERVO_RAMP 23
+
+
 
 class CRecyclingSort : public CBase4618
 {
@@ -32,6 +37,10 @@ private:
 	bool _is_blue;
 	bool _is_other;
 	bool _is_nothing;
+	int state;
+	int prev_state;
+	double _state_start_time;
+    bool _timer_started;
 
 public:
 	CRecyclingSort();

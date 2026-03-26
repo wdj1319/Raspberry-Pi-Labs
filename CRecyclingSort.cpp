@@ -2,7 +2,7 @@
 #include "CRecyclingSort.h"
 #include "cvui.h"
 #include "CSketch.h"
-#include "CControl.h"
+#include "CControlPi.h"
 #include "CBase4618.h"
 #include "sstream"
 #include "4618_Template.h"
@@ -28,11 +28,17 @@ CRecyclingSort::CRecyclingSort()
 	_is_blue = false;
 	_is_other = false;
 	_is_nothing = false;
-	_crop_x = 0;
-	_crop_y = 0;
-	_crop_height = 240;
-	_crop_width = 320;
+	_timer_started = false;
+	_crop_x = 281;
+	_crop_y = 269;
+	_crop_height = 162;
+	_crop_width = 168;
 	cvui::init("Settings");
+	prev_state = 0;
+	state = 1;
+	control.set_data(2, SERVO_WHEEL, 1400);
+	control.set_data(2, SERVO_RAMP, 1800);
+
 
 }
 
@@ -44,13 +50,87 @@ CRecyclingSort::~CRecyclingSort()
 
 bool CRecyclingSort::gpio()
 {
-	return true;
+
+    if (state == 3)
+    {
+        if (!_timer_started)
+        {
+            if(!_is_nothing)
+            {
+            if (_is_green)
+            {
+                control.set_data(1, 27, 1);
+                control.set_data(2, SERVO_RAMP, 1800);
+            }
+            else
+            {
+                control.set_data(1, 17, 1);
+                control.set_data(2, SERVO_RAMP, 1300);
+            }
+            }
+            _state_start_time = cv::getTickCount();
+            _timer_started = true;
+        }
+
+        double elapsed = (cv::getTickCount() - _state_start_time) / cv::getTickFrequency();
+
+        if (elapsed >= 1 && elapsed < 2)
+        {
+            if(!_is_nothing)
+            {
+            control.set_data(2, SERVO_WHEEL, 2500);
+            }
+        }
+        else if (elapsed >= 4)
+        {
+            _timer_started = false;
+            prev_state = state;
+            state = 1;
+        }
+    }
+    return true;
 }
+
 
 bool CRecyclingSort::update()
 {
+
 	if (_capture.isOpened())
 	{
+
+        if(state == 1 && (prev_state == 3 || prev_state == 0))
+        {
+            if(!_timer_started)
+            {
+            control.set_data(1, 27, 0);
+            control.set_data(1, 17, 0);
+            control.set_data(2, SERVO_WHEEL, 500);
+            _state_start_time = cv::getTickCount();
+            _timer_started = true;
+            }
+        double elapsed = (cv::getTickCount() - _state_start_time) / cv::getTickFrequency();
+        if (elapsed >= 3)
+        {
+            _timer_started = false;
+            prev_state = state;
+            state = 2;
+        }
+        }
+        if(state == 2 && prev_state == 1)
+        {
+        if (!_timer_started)
+        {
+            std::cout << "WHEEL\n";
+            control.set_data(2, SERVO_WHEEL, 1400);
+            _state_start_time = cv::getTickCount();
+            _timer_started = true;
+        }
+
+        double elapsed = (cv::getTickCount() - _state_start_time) / cv::getTickFrequency();
+        if (elapsed >= 2)
+        {
+            _timer_started = false;
+
 		_capture >> _frame;
 
 		_is_green = false;
@@ -110,12 +190,23 @@ bool CRecyclingSort::update()
                 break;
 			}
 		}
+            _timer_started = false;
+            prev_state = state;
+            state = 3;
+            }
+		}
+
 	}
 	return true;
 }
 
 bool CRecyclingSort::draw()
 {
+    if (_frame.empty())
+    {
+        return true;
+    }
+
     _settings_frame = cv::Mat::zeros(400, 450, CV_8UC3);
 
     if(cvui::button(_settings_frame, 20, 160, "Change color"))

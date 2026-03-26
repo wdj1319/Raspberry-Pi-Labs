@@ -90,7 +90,7 @@ bool CControlPi::set_data(int type, int channel, int val)
     if(type == SERVO) //servo
     {
         //GOES FROM 500 to 2500!!!!!!
-        gpioServo(SERVO_PIN, val);
+        gpioServo(channel, val);
         _last_servo_val = val;
         return true;
     }
