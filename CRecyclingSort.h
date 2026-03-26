@@ -43,6 +43,8 @@ private:
     bool _timer_started;
     bool _manual_ramp;
     bool _manual_mode;
+    int _bin_tracker1;
+    int _bin_tracker2;
 
 public:
 	CRecyclingSort();

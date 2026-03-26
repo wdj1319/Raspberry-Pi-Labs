@@ -36,6 +36,8 @@ CRecyclingSort::CRecyclingSort()
 	cvui::init("Settings");
 	_manual_ramp = false;
 	_manual_mode = false;
+	_bin_tracker1 = 0;
+	_bin_tracker2 = 0;
 	prev_state = 0;
 	state = 1;
 	control.set_data(2, SERVO_WHEEL, 1400);
@@ -46,6 +48,8 @@ CRecyclingSort::CRecyclingSort()
 
 CRecyclingSort::~CRecyclingSort()
 {
+
+    control.set_data(2, SERVO_WHEEL, 1400);
 	_capture.release();
 	cv::destroyAllWindows();
 }
@@ -60,7 +64,6 @@ bool CRecyclingSort::gpio()
     if (control.get_button(BUTTON_1, button))
     {
 
-        control.set_data(0, BLUE_LED, 1);
         _manual_mode = !_manual_mode;
         _timer_started = false;
         if(_manual_mode)
@@ -86,6 +89,7 @@ bool CRecyclingSort::gpio()
     if(state == 4)
     {
 
+        control.set_data(0, BLUE_LED, 1);
         if (!_timer_started)
         {
             _state_start_time = cv::getTickCount();
@@ -163,7 +167,7 @@ bool CRecyclingSort::update()
             _timer_started = true;
             }
         double elapsed = (cv::getTickCount() - _state_start_time) / cv::getTickFrequency();
-        if (elapsed >= 0.25)
+        if (elapsed >= 0.5)
         {
             _timer_started = false;
             prev_state = state;
@@ -232,14 +236,17 @@ bool CRecyclingSort::update()
                 if(green_amount > blue_amount && green_amount > 500)
                 {
                     _is_green = true;
+                    _bin_tracker1++;
                 }
                 else if(blue_amount > green_amount && blue_amount > 500)
                 {
                     _is_blue = true;
+                    _bin_tracker2++;
                 }
                 else
                 {
                     _is_other = true;
+                    _bin_tracker2++;
                 }
                 break;
 			}
@@ -270,6 +277,20 @@ bool CRecyclingSort::draw()
 
     _settings_frame = cv::Mat::zeros(400, 450, CV_8UC3);
 
+    bool _manual_check = _manual_mode;
+    cvui::checkbox(_settings_frame, 230, 40, "Manual Mode", &_manual_mode);
+
+        if(_manual_mode != _manual_check)
+        {
+        _timer_started = false;
+
+        if(_manual_mode)
+        {
+            state = 4;
+        }
+        }
+
+
     if(cvui::button(_settings_frame, 20, 160, "Change color"))
     {
         _color_slider++;
@@ -278,14 +299,39 @@ bool CRecyclingSort::draw()
             _color_slider = 0;
         }
     }
+    std::stringstream bin1;
+    std::stringstream bin2;
+
+    bin1 << "Bin 1 amount: " << _bin_tracker1;
+    bin2 << "Bin 2 amount: " << _bin_tracker2;
+    cvui::text(_settings_frame, 270, 90, bin1.str(), 0.4);
+    cvui::text(_settings_frame, 270, 140, bin2.str(), 0.4);
+    if (_manual_mode)
+    {
+        if (cvui::button(_settings_frame, 230, 90, "BIN 1"))
+        {
+            _manual_ramp = true;
+           control.set_data(2, SERVO_RAMP, 1800);
+        }
+        if (cvui::button(_settings_frame, 230, 140, "BIN 2"))
+        {
+            _manual_ramp = false;
+           control.set_data(2, SERVO_RAMP, 1500);
+        }
+    }
+    if(cvui::button(_settings_frame, 230, 190, "Reset Counters"))
+    {
+        _bin_tracker1 = 0;
+        _bin_tracker2 = 0;
+    }
     cvui::text(_settings_frame, 20, 20, "Range", 0.4);
     cvui::trackbar(_settings_frame, 20, 40, 180, &_min_hue, 0, 180);
     cvui::trackbar(_settings_frame, 20, 90, 180, &_max_hue, 0, 180);
     cvui::text(_settings_frame, 230, 20, "Crop x, y, width, height", 0.4);
-    cvui::trackbar(_settings_frame, 230, 40, 180, &_crop_x, 0, _frame.cols-10);
-    cvui::trackbar(_settings_frame, 230, 90, 180, &_crop_y, 0, _frame.rows-10);
-    cvui::trackbar(_settings_frame, 230, 140, 180, &_crop_width, 50, _frame.cols);
-    cvui::trackbar(_settings_frame, 230, 190, 180, &_crop_height, 50, _frame.rows);
+    //cvui::trackbar(_settings_frame, 230, 40, 180, &_crop_x, 0, _frame.cols-10);
+    //cvui::trackbar(_settings_frame, 230, 90, 180, &_crop_y, 0, _frame.rows-10);
+    //cvui::trackbar(_settings_frame, 230, 140, 180, &_crop_width, 50, _frame.cols);
+    //cvui::trackbar(_settings_frame, 230, 190, 180, &_crop_height, 50, _frame.rows);
 
     cvui::text(_settings_frame, 230, 240, "Min Saturation", 0.4);
     cvui::trackbar(_settings_frame, 230, 260, 180, &_min_sat, 0, 60);
