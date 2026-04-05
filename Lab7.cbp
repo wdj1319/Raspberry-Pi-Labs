@@ -61,6 +61,8 @@
 		<Unit filename="../Labs/4618_Template-master/CSpaceInvaderGame.cpp" />
 		<Unit filename="../Labs/4618_Template-master/CSpaceInvaderGame.h" />
 		<Unit filename="../Labs/4618_Template-master/cvui.h" />
+		<Unit filename="../Labs/4618_Template-master/server.cpp" />
+		<Unit filename="../Labs/4618_Template-master/server.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

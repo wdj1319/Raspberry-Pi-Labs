@@ -1,5 +1,7 @@
 #pragma once
 #include "CBase4618.h"
+#include "server.h"
+#include <thread>
 
 
 #define SERVO_WHEEL 26
@@ -45,6 +47,8 @@ private:
     bool _manual_mode;
     int _bin_tracker1;
     int _bin_tracker2;
+    CServer _server;
+    std::thread _server_thread;
 
 public:
 	CRecyclingSort();

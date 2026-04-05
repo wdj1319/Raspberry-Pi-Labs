@@ -6,6 +6,9 @@
 #include "CBase4618.h"
 #include "sstream"
 #include "4618_Template.h"
+#include <thread>
+#include <mutex>
+#include"server.h"
 
 CRecyclingSort::CRecyclingSort()
 {
@@ -42,6 +45,7 @@ CRecyclingSort::CRecyclingSort()
 	state = 1;
 	control.set_data(2, SERVO_WHEEL, 1400);
 	control.set_data(2, SERVO_RAMP, 1800);
+	_server_thread = std::thread(&CServer::start, &_server, 4618);
 
 
 }
@@ -50,8 +54,15 @@ CRecyclingSort::~CRecyclingSort()
 {
 
     control.set_data(2, SERVO_WHEEL, 1400);
+    control.set_data(0, BLUE_LED, 0);
+    _server.stop();
+    if (_server_thread.joinable())
+    {
+        _server_thread.join();
+    }
 	_capture.release();
 	cv::destroyAllWindows();
+
 }
 
 bool CRecyclingSort::gpio()
@@ -167,7 +178,7 @@ bool CRecyclingSort::update()
             _timer_started = true;
             }
         double elapsed = (cv::getTickCount() - _state_start_time) / cv::getTickFrequency();
-        if (elapsed >= 0.5)
+        if (elapsed >= 1)
         {
             _timer_started = false;
             prev_state = state;
@@ -260,6 +271,54 @@ bool CRecyclingSort::update()
             else
             {
                 state = 3;
+            }
+		}
+
+		std::vector<std::string> get_cmds;
+		_server.get_cmd(get_cmds);
+
+		for(int cmd_index = 0; cmd_index<get_cmds.size(); cmd_index++)
+		{
+            if(get_cmds[cmd_index] == "S 0 1")
+            {
+                _manual_mode = false;
+            }
+            else if(get_cmds[cmd_index] == "S 0 0")
+            {
+                _manual_mode = true;
+            }
+            else if(get_cmds[cmd_index] == "S 1 0")
+            {
+                if(_manual_mode)
+                {
+                    control.set_data(2, SERVO_RAMP, 1800);
+                }
+            }
+            else if(get_cmds[cmd_index] == "S 1 1")
+            {
+                if(_manual_mode)
+                {
+                    control.set_data(2, SERVO_RAMP, 1500);
+                }
+            }
+             if(get_cmds[cmd_index] == "G 0")
+            {
+            if(_manual_mode)
+            {
+                _server.send_string("OFF\n");
+            }
+            else
+            {
+                _server.send_string("ON\n");
+            }
+            }
+            if(get_cmds[cmd_index] == "G 1 0")
+            {
+            _server.send_string(std::to_string(_bin_tracker1) + "\n");
+            }
+            if(get_cmds[cmd_index] == "G 1 1")
+            {
+                _server.send_string(std::to_string(_bin_tracker2) + "\n");
             }
 		}
 
@@ -372,5 +431,9 @@ bool CRecyclingSort::draw()
 	cv::imshow("ROI", _cropped_frame);
 	cv::imshow("Contour Feed", _contour_frame);
 	cv::imshow("Settings", _settings_frame);
+
+
+    _server.set_txim(_frame);
+
 	return true;
 }
